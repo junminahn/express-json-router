@@ -1,102 +1,47 @@
 # express-json-router
 
-API Request Handler
+Express router wrapper to send json response
 
 ## Installation
+
 ```sh
 $ npm install express-json-router
 ```
+
 ## Usage
 
-### handleResponse
-- handleResponse (callback)
-- handleResponse (callback, callback2)
-- handleResponse ([callback, callback2])
-
-### errorMessageProvider
-- apiHandler.errorMessageProvider = customErrorMessageProvider
-
-### Example
 ```js
-const http = require('http');
 const express = require('express');
-const axios = require('axios');
-
-const apiHandler = require('express-json-router');
-const baseUrl = 'http://localhost:8080';
-
-const handleResponse = apiHandler.handleResponse;
-
+const JsonRouter = require('express-json-router');
+const router = new JsonRouter();
+const clientErrors = JsonRouter.clientErrors;
 const app = express();
-app.set('port', 8080);
-const server = http.createServer(app);
-server.listen(8080);
 
-// Single Middleware
-app.get('/single-middleware', handleResponse(fnApple)); // apple; status 200
+router.all('/all-route', () => 'all-route');
+router.get('/get-route', () => 'get-route');
+router.post('/post-route', () => 'post-route');
+router.put('/put-route', () => 'put-route');
+router.delete('/delete-route', () => 'delete-route');
 
-// Multiple Middlewares
-app.get('/multiple-middlewares', handleResponse(fnAppleNext, fnPear)); // pear; status 200
+router
+  .route('/route-route')
+  .all((req, res, next) => next())
+  .get(() => 'route-get-route')
+  .post(() => 'route-post-route')
+  .put(() => 'route-put-route')
+  .delete(() => 'route-delete-route');
 
-// Multiple Middlewares Array
-app.get('/multiple-middlewares-array', handleResponse([fnAppleNext, fnPear])); // pear; status 200
+router.get(
+  '/next',
+  (req, res, next) => next(),
+  () => 'next-test'
+);
 
-// Multiple Async Middlewares
-app.get('/multiple-async-middlewares', handleResponse(fnAppleNext, fnPearPromise)); // pear; status 200
+router.get('/unauthorized-error', () => {
+  throw new clientErrors.UnauthorizedError();
+});
 
-// Error Handling
-app.get('/error-handling', handleResponse(fnAppleNext, fnError1, fnPear)); // error1; status 422
-
-// Async Error Handling
-app.get('/async-error-handling', handleResponse(fnAppleNext, fnError1Promise, fnPear)); // error1; status 422
-
-// Multiple Async Error Handling
-app.get('/multiple-async-error-handling', handleResponse(fnError2Next, fnError1)); // error1; status 422
-
-// Custom Error Message Provider
-apiHandler.errorMessageProvider = function(err) {
-  return 'customError';
-}
-app.get('/custom-error-message-provider', handleResponse(fnError1)); // customError; status 422
-
-function fnApple(req, res, next) {
-  return 'apple';
-}
-
-function fnApplePromise(req, res, next) {
-  return Promise.resolve('apple');
-}
-
-function fnAppleNext(req, res, next) {
-  next();
-  return 'apple'
-}
-
-function fnPear(req, res, next) {
-  return 'pear';
-}
-
-function fnPearPromise(req, res, next) {
-  return Promise.resolve('pear');
-}
-
-function fnPearNext(req, res, next) {
-  next();
-  return Promise.resolve('pear');
-}
-
-function fnError1(req, res, next) {
-  throw new Error('error1');
-}
-
-function fnError1Promise(req, res, next) {
-  return Promise.reject(new Error('error1'));
-}
-
-function fnError2Next(req, res, next) {
-  next();
-  throw new Error('error2');
-}
+app.use('/', router.original).listen();
 ```
 
 ### [MIT Licensed](LICENSE)

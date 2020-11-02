@@ -2,10 +2,18 @@
 
 Express router wrapper to send json response
 
+![Test Status](https://github.com/junminahn/express-json-router/workflows/Tests/badge.svg)
+![Publish Status](https://github.com/junminahn/express-json-router/workflows/Node.js%20Package/badge.svg)
+![NPM](https://img.shields.io/npm/v/express-json-router.svg)
+
 ## Installation
 
 ```sh
 $ npm install express-json-router
+```
+
+```sh
+$ yarn add express-json-router
 ```
 
 ## Usage
@@ -50,5 +58,9 @@ router.get('/unauthorized-error', () => {
 
 app.use('/', router.original).listen();
 ```
+
+## Client Errors
+
+- See https://www.npmjs.com/package/client-errors#client-errors-1 for more details.
 
 ### [MIT Licensed](LICENSE)

@@ -83,4 +83,10 @@ class JsonRouter {
 
 JsonRouter.clientErrors = clientErrors;
 
+Object.defineProperty(JsonRouter, 'errorMessageProvider', {
+  set: function (customErrorMessageProvider) {
+    apiHandler.errorMessageProvider = customErrorMessageProvider;
+  },
+});
+
 module.exports = JsonRouter;

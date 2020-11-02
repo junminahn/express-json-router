@@ -17,6 +17,13 @@ const router = new JsonRouter();
 const clientErrors = JsonRouter.clientErrors;
 const app = express();
 
+// Optional error message provider
+// Default to `error.message || error._message || error`
+JsonRouter.errorMessageProvider = function (error) {
+  // Place an error parser here and return the new message.
+  return 'It is a processed error message';
+};
+
 router.all('/all-route', () => 'all-route');
 router.get('/get-route', () => 'get-route');
 router.post('/post-route', () => 'post-route');

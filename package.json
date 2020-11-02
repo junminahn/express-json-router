@@ -21,6 +21,9 @@
     "commit": "git-cz",
     "changelog": "standard-version"
   },
+  "files": [
+    "index.js"
+  ],
   "engines": {
     "node": ">= 12.18.3"
   },

@@ -4,6 +4,10 @@ const request = require('supertest');
 const JsonRouter = require('./index');
 const router = new JsonRouter();
 const clientErrors = JsonRouter.clientErrors;
+
+const ORIGINAL_ERROR_MESSAGE = 'It is an original error message';
+const CUSTOM_ERROR_MESSAGE = 'It is a custom error message';
+
 const app = express();
 
 router.all('/all-route', () => 'all-route');
@@ -28,6 +32,14 @@ router.get(
 
 router.get('/unauthorized-error', () => {
   throw new clientErrors.UnauthorizedError();
+});
+
+router.get('/original-error-message', () => {
+  throw new Error(ORIGINAL_ERROR_MESSAGE);
+});
+
+router.get('/custom-error-message', () => {
+  throw new Error(ORIGINAL_ERROR_MESSAGE);
 });
 
 app.use('/', router.original).listen();
@@ -133,6 +145,32 @@ describe(`Check other routing functions`, function () {
       .expect('Content-Type', /json/)
       .end((err, res) => {
         expect(res.body.message).to.be.equal('The user is not authorized');
+        return done();
+      });
+  });
+
+  it(`original-error-message`, function (done) {
+    request(app)
+      .get('/original-error-message')
+      .expect(401)
+      .expect('Content-Type', /json/)
+      .end((err, res) => {
+        expect(res.body.message).to.be.equal(ORIGINAL_ERROR_MESSAGE);
+        return done();
+      });
+  });
+
+  it(`custom-error-message`, function (done) {
+    JsonRouter.errorMessageProvider = function (err) {
+      return 'CUSTOM_ERROR_MESSAGE';
+    };
+
+    request(app)
+      .get('/custom-error-message')
+      .expect(401)
+      .expect('Content-Type', /json/)
+      .end((err, res) => {
+        expect(res.body.message).to.be.equal('CUSTOM_ERROR_MESSAGE');
         return done();
       });
   });
